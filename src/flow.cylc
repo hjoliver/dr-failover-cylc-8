@@ -1,0 +1,20 @@
+[scheduling]
+   cycling mode = integer
+   [[graph]]
+      R1 = """
+         prep1 => prep2 => prep3 => data
+      """
+      P1 = """
+         prep3[^] => data
+         data => a & x
+         a => b & c
+         x => y & z
+         a[-P1] => a
+         x[-P1] => x
+      """
+[runtime]
+   [[root]]
+      script = sleep 10
+   [[prep1, prep2, prep3, data]]
+   [[a, b, c]]
+   [[x, y, z]]
