@@ -27,6 +27,7 @@ the main workflows. We just have to ensure that workflow- and disk-states
 are compatible at start up - i.e., that the input data is in place for all
 tasks involved in (re)starting the flow.
 
+
 ### Overview
 
 Choose convenient [sync points](#sync-points) in each workflow.
@@ -167,26 +168,23 @@ be ignored. (If you have multiple cycling intervals you may still need to use
 
 ## Parentless Tasks
 
-It is the completion of upstream (parent) outputs that normally tells the
-scheduler when to spawn a task into the active window.
+It is the completion of upstream (parent) outputs that normally tells Cylc
+when to spawn dependent tasks into the active window.
 
-Parentless tasks, which depend only on clock and xtriggers, if anything, must be
-continually spawned automatically within the runahead limit. Cycling workflows
-often have these at the top of each cycle. (See task `x` in the example below).
+Cycling workflows, however, often have parentless tasks at the top of each cycle.
+(See task `x` in the example below). These must be automatically and continually
+spawned out to the runahead limit. 
 
-In a cold start from the beginning of the graph, Cylc automatically spawns the
-first instance of any parentless tasks and continues to spawn them from that
-point as the workflow moves on. However, for triggering a new flow in the middle
-of the graph, if you don't explicitly trigger a parentless task Cylc won't
-know which instance of it should be the first, or even if you don't want any
-to spawn (maybe you only want to trigger a dead-ending sub-graph).
+In a normal start from the beginning of the graph, Cylc automatically spawns the
+first instance of any parentless tasks, to bootstrap this process.
 
-For DR failover we want to trigger a new flow that continues to traverse the
-whole graph, so we need to specifically trigger or set a first instance of each
-parentless task for the scheduler to continue from.
+For triggering a new flow in the middle of the graph though, you must explicitly
+trigger an instance of any parentless task because Cylc can't know exactly which
+should be the first instance to start from. (In fact it's possible that you only
+want to run a sub-graph that dead-ends without continuing to future cycle points).
 
-Use `cylc set --pre=all` to spawn tasks (including parentless tasks) and begin 
-checking their clock or xtriggers (if any). 
+Use `cylc set --pre=all` spawns tasks (including parentless tasks) into the active
+window (with all task-prerequisites satisfied) to begin checking on any xtriggers.
 
 <table>
 <tr>
@@ -268,3 +266,35 @@ $ cylc trigger --flow=none ecx//1/prep
 ```console
 $ cylc release "ecx//*"
 ```
+
+## Generic Aspects
+
+The document above focuses mainly on specific Cylc capabilities that allow
+workflow-driven failover at arbitrary sync points. 
+
+This section briefly covers several more generic aspects. These are relatively
+easy to achieve one way or another and don't require a lot of Cylc knowledge.
+
+### How do the workflow configurations end up on the remote platform?
+
+Options include:
+  - (re)copy them over with each sync point transfer
+    - this guarantees compatibility with the sync point restart data
+  - (re)deploy them, e.g. via a dev-ops pipeline, before bringing up the remote system
+    - this brings a small risk of failure due to sync point data being incompatible
+    with changes deployed since the last sync
+  - whenever they are (re)deployed on one system, deploy them on both systems
+    - (ditto re small risk of failure)
+
+### Fail-back
+
+The DR system must also run the sync workflow, to transfer data ready for eventual
+fail-back.
+
+### Housekeeping
+
+To avoid endless accumulation of sync point data, we could automatically delete old
+sync point data after each new transfer completes.
+
+(Note the housekeeping tasks within each workflow might take care of old data too,
+but not until the system has been brought up).
