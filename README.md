@@ -1,5 +1,7 @@
 # Workflow-driven DR failover with Cylc 8
 
+**(Table of Contents: See dropdown menu above right.)**
+
 ## The Problem
 
 I need to (re)start cycling workflows mid-run on a remote Disaster Recovery
@@ -39,7 +41,7 @@ Choose convenient [sync points](#sync-points) in each workflow.
  - Once data transfer completes, record that this sync point is ready if needed.
     - (Update a database or a config file on the other platform, to say that.)
 
-### Sync Workflow
+### The Sync Workflow
 
 To avoid modifying the main workflows we can make a separate *sync workflow*
 whose tasks trigger off of the main workflow sync points. It could be
@@ -228,6 +230,38 @@ To do this:
        and remove the held tasks once the flow reaches them
  4. once the prep task(s) finish, release (unhold) the start tasks
 
+## Generic Aspects
+
+The document above focuses mainly on specific Cylc capabilities that allow
+workflow-driven failover at arbitrary sync points. 
+
+This section briefly covers several more generic aspects. These are relatively
+easy to achieve one way or another and don't require a lot of Cylc knowledge.
+
+### Updating Workflow Configs on the Remote Platform
+
+Options include:
+  - (re)copy them over with each sync point transfer
+    - this guarantees compatibility with the sync point restart data
+  - (re)deploy them, e.g. via a dev-ops pipeline, before bringing up the remote system
+    - small risk of failure due to changes deployed since the last sync
+  - whenever they are (re)deployed on one system, deploy them on both systems
+    - ditto: small risk of failure due to changes deployed since the last sync
+
+### Fail-back
+
+The DR system must also run the sync workflow, to transfer data ready for eventual
+fail-back.
+
+### Housekeeping
+
+To avoid endless accumulation of sync point data, we could automatically delete old
+sync point data after each new transfer completes.
+
+(Note the housekeeping tasks within each workflow might take care of old data too,
+but not until the system has been brought up).
+
+
 ## An example
 
 ![example](src/cgraph.png)
@@ -267,34 +301,4 @@ $ cylc trigger --flow=none ecx//1/prep
 $ cylc release "ecx//*"
 ```
 
-## Generic Aspects
 
-The document above focuses mainly on specific Cylc capabilities that allow
-workflow-driven failover at arbitrary sync points. 
-
-This section briefly covers several more generic aspects. These are relatively
-easy to achieve one way or another and don't require a lot of Cylc knowledge.
-
-### How do the workflow configurations end up on the remote platform?
-
-Options include:
-  - (re)copy them over with each sync point transfer
-    - this guarantees compatibility with the sync point restart data
-  - (re)deploy them, e.g. via a dev-ops pipeline, before bringing up the remote system
-    - this brings a small risk of failure due to sync point data being incompatible
-    with changes deployed since the last sync
-  - whenever they are (re)deployed on one system, deploy them on both systems
-    - (ditto re small risk of failure)
-
-### Fail-back
-
-The DR system must also run the sync workflow, to transfer data ready for eventual
-fail-back.
-
-### Housekeeping
-
-To avoid endless accumulation of sync point data, we could automatically delete old
-sync point data after each new transfer completes.
-
-(Note the housekeeping tasks within each workflow might take care of old data too,
-but not until the system has been brought up).
