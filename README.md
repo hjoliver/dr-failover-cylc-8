@@ -230,11 +230,10 @@ To do this:
        and remove the held tasks once the flow reaches them
  4. once the prep task(s) finish, release (unhold) the start tasks
 
-## Generic Aspects
+## Generic Aspects of Workflow DR
 
-This section briefly covers several more generic aspects of the DR problem.
-These are relatively easy to achieve one way or another and don't require
-a lot of specialist Cylc knowledge.
+This section briefly covers aspects of the DR problem that are relatively
+easy to achieve one way or another and aren't particular Cylc-specific.
 
 ### Updating Workflow Configs on the Remote Platform
 
@@ -250,6 +249,11 @@ Options include:
 
 The DR system must also run the sync workflow, to transfer data ready for eventual
 fail-back.
+
+### Portable Workflows
+
+The workflows must automatically handle any relevant differences between the two
+systems (e.g., different workload manager queues, different directory paths, etc.)
 
 ### Housekeeping
 
