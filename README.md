@@ -232,11 +232,9 @@ To do this:
 
 ## Generic Aspects
 
-The document above focuses mainly on specific Cylc capabilities that allow
-workflow-driven failover at arbitrary sync points. 
-
-This section briefly covers several more generic aspects. These are relatively
-easy to achieve one way or another and don't require a lot of Cylc knowledge.
+This section briefly covers several more generic aspects of the DR problem.
+These are relatively easy to achieve one way or another and don't require
+a lot of specialist Cylc knowledge.
 
 ### Updating Workflow Configs on the Remote Platform
 
