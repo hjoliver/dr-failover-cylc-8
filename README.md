@@ -275,7 +275,8 @@ been copied into place first).
 **TODO: more comprehensive example(s).**
 
 Sync point:
-- I can start from `2/a`, `2/x`, and `3/data`
+- I can start from `2/a`, `2/x`, and `3/data`<br/>
+  (the entire future graph lies downstream of these tasks)
 - I need the start-up task `1/prep` to run first
 
 1. start paused, with the start tasks in the pool waiting
