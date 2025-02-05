@@ -272,16 +272,13 @@ been copied into place first).
 
 **TODO: more comprehensive example(s).**
 
-Sync point (see `cgraph.png` with cycle point 2 -> 3):
-- I can start from `3/a`, `3/x`, and `4/data`
-- I need the start-up task 1/prep to run first
-- No stall due to off-flow or inter-cycle dependencies
-
-NOTE: note `cylc play --start-task` uses pre-initial ignore on intercycle dependencies.
+Sync point:
+- I can start from `2/a`, `2/x`, and `3/data`
+- I need the start-up task `1/prep` to run first
 
 1. start paused, with the start tasks in the pool waiting
 ```console
-$ cylc vip --pause ecx -t //3/a -t //3/x -t //4/data
+$ cylc vip --pause ecx -t //2/a -t //2/x -t //3/data
 ```
 
 2. resume the workflow after holding the start tasks
