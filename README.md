@@ -47,7 +47,7 @@ To avoid modifying the main workflows we can make a separate *sync workflow*
 whose tasks trigger off of the main-workflow sync points. It could be
 auto-generated from a configuration file that records, for each sync point:
 - When (after completion of which tasks?) to trigger the associated data sync task.
-- What is needed (which tasks to trigger) to (re)start the flow at that point in
+- What is needed (which tasks to trigger?) to (re)start the flow at that point in
   the graph.
 
 ### Failover Restart
@@ -55,7 +55,7 @@ auto-generated from a configuration file that records, for each sync point:
 If failover is needed, on the other platform, run a script that loops over the
 workflows and (re)starts each at its most recent sync points.
 
-If the sync point is at a bottleneck in a workflow graph, (re)start might be as
+If the sync point is at a bottleneck in the workflow graph, (re)start might be as
 simple specifying one [start task](#start-tasks) but you may also need to handle
  - [off-flow prerequisites](#off-flow-prerequisites)
  - [parentless tasks](#parentless-tasks)
@@ -184,7 +184,8 @@ first instance of any parentless tasks, to bootstrap this process.
 For triggering a new flow in the middle of the graph though, you must explicitly
 trigger an instance of any parentless task because Cylc can't know exactly which
 should be the first instance to start from. (In fact it's possible that you only
-want to run a sub-graph that dead-ends without continuing to future cycle points).
+want to run a sub-graph that dead-ends without continuing to future cycle points,
+in which case none of these parentless tasks should be spawned).
 
 Use `cylc set --pre=all` spawns tasks (including parentless tasks) into the active
 window (with all task-prerequisites satisfied) to begin checking on any xtriggers.
@@ -234,7 +235,7 @@ To do this:
 ## Generic Aspects of Workflow DR
 
 This section briefly covers aspects of the DR problem that are relatively
-easy to achieve one way or another and aren't particular Cylc-specific.
+easy to achieve one way or another and aren't particularly Cylc-specific.
 
 ### Updating Workflow Configs on the Remote Platform
 
@@ -261,8 +262,8 @@ systems (e.g., different workload manager queues, different directory paths, etc
 To avoid endless accumulation of sync point data, we could automatically delete old
 sync point data after each new transfer completes.
 
-(Note the housekeeping tasks within each workflow might take care of old data too,
-but not until the system has been brought up).
+(Housekeeping tasks within each workflow might take care of old data too, but obviously
+not until the workflows have been brought up).
 
 
 ## An example
